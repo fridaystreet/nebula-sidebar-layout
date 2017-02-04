@@ -1,6 +1,6 @@
 {
   "name": "nebula-sidebar-layout",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A web component to display a collapsable sidebar layout.",
   "license": "ISC",
   "author": "Chris Beckett <chrisb@arsnebula.com>",

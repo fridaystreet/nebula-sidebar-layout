@@ -20,7 +20,7 @@
     "navigation",
     "menu"
   ],
-  "main": "nebula-sidebar.html",
+  "main": "nebula-sidebar-layout.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.7.1",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.3.1",

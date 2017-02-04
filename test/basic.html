@@ -1,0 +1,32 @@
+<!doctype html>
+
+<html>
+  <head>
+    <title>nebula-sidebar-layout</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../inert-polyfill/inert-polyfill.min.js"></script>
+    <link rel="import" href="../nebula-sidebar-layout.html">
+  </head>
+  <body>
+    <test-fixture id="basic">
+      <template>
+        <nebula-sidebar-layout></nebula-sidebar-layout>
+      </template>
+    </test-fixture>
+
+    <script>
+      suite('basic', function() {
+        var el
+        setup(function() {
+          el = fixture('basic')
+        })
+        test('element is created', function() {
+          assert.equal(el.is, 'nebula-sidebar-layout')
+        })
+      })
+    </script>
+  </body>
+</html>

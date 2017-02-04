@@ -1,0 +1,295 @@
+<!--
+@license
+Copyright (c) 2017 Ars Nebula LLC.
+This code may be used under the terms found in LICENSE.md of this repository.
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../nebula-style-attributes-behavior/nebula-style-attributes-behavior.html">
+
+<!--
+`<nebula-sidebar-layout>` is a web component to display a collapsable sidebar layout.
+
+## Usage
+
+The layout uses off-screen positioning for the sidebar when collapsed, and is meant to be used as a layout that encompasses the full height and width of the screen.
+
+The following is a typical base style to ensure that the HTML `body` element is sized to fit the browser screen height and width.
+
+```css
+html, body {
+  position: relative;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+```
+
+The element displays a two-column side-by-side layout with a fixed width sidebar on the left, and a fluid content container on the right. Content is inserted into each column using the `sidebar` and `content` named slots.
+
+```html
+<nebula-sidebar-layout id="sidebar" collapsed="{{collapsed}}" opened="{{opened}}" on-change="_onSidebarChanged">
+  <div slot="sidebar"></div>
+  <div slot="content"></div>
+</nebula-sidebar-layout>
+```
+
+Use the `breakpoint` property to set the media query that determines when the sidebar is collapsed. The default value collapses the sidebar when the browser screen width is less than 960px. To manually collapse the sidebar, set the `breakpoint` to empty, and `collapsed` to true.
+
+```html
+<nebula-sidebar-layout breakpoint collapsed>
+  <div slot="sidebar"></div>
+  <div slot="content"></div>
+</nebula-sidebar-layout>
+```
+
+## Style
+
+You can style the element using CSS custom properties and mixins:
+
+Custom property | Description | Default
+:--- | :--- | :---
+`--nebula-sidebar-layout-backdrop-color` | The color of the backdrop. | hsla(0, 0%, 0%, 0.6)
+`--nebula-sidebar-layout-background-color` | The background color for the element. | transparent
+`--nebula-sidebar-layout-width` | The fixed width of the sidebar container. | 280px
+`--nebula-sidebar-layout-transition-duration` | The speed of transitions. | 0.25s
+`--nebula-sidebar-layout-z-index` | The stacking elevation of the sidebar overlay. | 9998
+
+The following styles can also be set as attributes on the element:
+
+- 'backdrop-color'
+- `width`
+
+@demo demo/index.html
+-->
+
+<dom-module id="nebula-sidebar-layout">
+  <template>
+    <style>
+      :host {
+        --nebula-sidebar-layout-backdrop-color: hsla(0, 0%, 0%, 0.6);
+        --nebula-sidebar-layout-background-color: transparent;
+        --nebula-sidebar-layout-width: 280px;
+        --nebula-sidebar-layout-transition-duration: 0.25s;
+        --nebula-sidebar-layout-z-index: 9998;
+        position: relative;
+        display: block;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background-color: var(--nebula-sidebar-layout-background-color);
+        height: 100%;
+        width: 100%;
+        @apply --layout-horizontal;
+        @apply --nebula-sidebar-layout;
+      }
+      :host([collapsed][opened]) {
+        cursor: pointer;
+      }
+      #content {
+        cursor: default;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        outline: 0;
+        overflow: hidden;
+        overflow-y: auto;
+        @apply --layout-flex-auto;
+        @apply --layout-vertical;
+      }
+      #content:after {
+        content: '';
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background-color: var(--nebula-sidebar-layout-backdrop-color);
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity var(--nebula-sidebar-layout-transition-duration) linear, visibility 0s linear var(--nebula-sidebar-layout-transition-duration);
+      }
+      :host([collapsed][opened]) #content:after {
+        visibility: visible;
+        opacity: 1;
+        transition: opacity var(--nebula-sidebar-layout-transition-duration) linear;
+      }
+      #sidebar {
+        cursor: default;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        outline: 0;
+        overflow: hidden;
+        overflow-y: auto;
+        width: var(--nebula-sidebar-layout-width);
+        transform: translate3d(0, 0, 0);
+        transition: transform var(--nebula-sidebar-layout-transition-duration) ease;
+        @apply --layout-flex-none;
+        @apply --layout-vertical;
+      }
+      :host([collapsed]) #sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        visibility: hidden;
+        transform: translate3d(-100%, 0, 0);
+        transition: transform var(--nebula-sidebar-layout-transition-duration) ease, visibility 0s linear var(--nebula-sidebar-layout-transition-duration);
+      }
+      :host([collapsed][opened]) #sidebar {
+        z-index: var(--nebula-sidebar-layout-z-index);
+        visibility: visible;
+        transform: translate3d(0, 0, 0);
+        transition: transform var(--nebula-sidebar-layout-transition-duration) ease;
+      }
+    </style>
+    <div id="sidebar" tabindex="-1">
+      <slot name="sidebar"></slot>
+    </div>
+    <div id="content" inert$="{{opened}}" tabindex="-1">
+      <slot name="content"></slot>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      /**
+      * Event triggered when the element collapsed or opened state is changed.
+      * Check the event detail for `collapsed` and `opened` values.
+      * @event changed
+      */
+      is: 'nebula-sidebar-layout',
+      behaviors: [
+        Nebula.StyleAttributesBehavior
+      ],
+      hostAttributes: {
+        'role': 'dialog'
+      },
+      properties: {
+        /**
+        * True if the sidebar is open, otherwise false.
+        * The property is ignored if the element is not collapsed.
+        */
+        opened: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true,
+          value: false
+        },
+        /**
+        * True if the sidebar is collapsed, otherwise false.
+        */
+        collapsed: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true,
+          value: false
+        },
+        /**
+        * Media query used to match breakpoint for collapsing the sidebar.
+        * Set to null to collapse the element manually.
+        * Defaults to `(max-width: 960px)`.
+        */
+        breakpoint: {
+          type: String,
+          value: '(max-width: 960px)'
+        },
+        /**
+        * A static map of attributes  CSS variables for theming.
+        */
+        styleAttributes: {
+          'backdrop-color': '--nebula-sidebar-layout-backdrop-color',
+          'width': '--nebula-sidebar-layout-width'
+        }
+      },
+      listeners: {
+        'tap': '_onTap'
+      },
+      observers: [
+        '_onOpenedChanged(opened)',
+        '_onCollapsedChanged(collapsed)',
+        '_onBreakpointChanged(breakpoint)'
+      ],
+      /**
+      * Event handler triggered when a the element is tapped.
+      */
+      _onTap: function(e) {
+        if (this.opened) {
+          e.preventDefault()
+          this.set('opened', false)
+        }
+      },
+      _onCollapsedChanged: function(collapsed) {
+        this.fire('changed', {collapsed: this.collapsed, opened: this.opened}, {bubbles: false})
+      },
+      /**
+       * 
+      * Property observer triggered when the `opened` property is changed.
+      */
+      _onOpenedChanged: function(opened) {
+        if (opened) {
+          this.$.sidebar.focus()
+          window.addEventListener('resize', this._onResize.bind(this))
+          this.fire('changed', {collapsed: this.collapsed, opened: this.opened}, {bubbles: false})
+        } else {
+          this.$.content.focus()
+          window.removeEventListener('resize', this._onResize)
+          this.fire('changed', {collapsed: this.collapsed, opened: this.opened}, {bubbles: false})
+        }
+      },
+      /**
+      * Event handler triggered when the window is resized.
+      * If the element is currently open, it will close the element.
+      */
+      _onResize: function(e) {
+        if (this.opened) {
+          this.set('opened', false)
+        }
+      },
+      /**
+      * Property observer triggered when the `breakpoint` property is changed.
+      */
+      _onBreakpointChanged: function(breakpoint) {
+        if (this._mq) mq.removeListener(this._onBreakpoint)
+        if (breakpoint && breakpoint.length > 0) {
+          this._mq = window.matchMedia(breakpoint)
+          this._mq.addListener(this._onBreakpoint.bind(this))
+          this.set('collapsed', this._mq.matches)
+        }        
+      },
+      /**
+      * Event listener triggered when the breakpoint media query is matched.
+      */
+      _onBreakpoint: function(e) {
+        this.set('collapsed', this._mq.matches)
+      },
+      /**
+      * Opens the element if currently collapsed.
+      */
+      open: function() {
+        if (this.collapsed) {
+          this.set('opened', true)
+        }        
+      },
+      /**
+      * Closes the element if currently open.
+      */ 
+      close: function() {
+        if (this.opened) {
+          this.set('opened', false)
+        }        
+      }
+    })
+  </script>
+</dom-module>

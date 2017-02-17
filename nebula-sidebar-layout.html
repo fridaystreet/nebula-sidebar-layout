@@ -6,6 +6,7 @@ This code may be used under the terms found in LICENSE.md of this repository.
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../iron-media-query/iron-media-query.html">
 <link rel="import" href="../nebula-style-attributes-behavior/nebula-style-attributes-behavior.html">
 
 <!--
@@ -35,16 +36,30 @@ html, body {
 The element displays a two-column side-by-side layout with a fixed width sidebar on the left, and a fluid content container on the right. Content is inserted into each column using the `sidebar` and `content` named slots.
 
 ```html
-<nebula-sidebar-layout id="sidebar" collapsed="{{collapsed}}" opened="{{opened}}" on-change="_onSidebarChanged">
-  <div slot="sidebar"></div>
+<nebula-sidebar-layout
+  breakpoint="(max-width: 960px)"
+  collapsed="{{collapsed}}"
+  opened="{{opened}}"
+  on-change="_onSidebarChanged">
+  <div slot="sidebar" style="width: 280px"></div>
   <div slot="content"></div>
 </nebula-sidebar-layout>
 ```
 
-Use the `breakpoint` property to set the media query that determines when the sidebar is collapsed. The default value collapses the sidebar when the browser screen width is less than 960px. To manually collapse the sidebar, set the `breakpoint` to empty, and `collapsed` to true.
+The sidebar container width is set to `fit-content`. To specify the width of the sidebar, set a fixed width on the sidebar slot content.
+
+```css
+<style>
+  nebula-sidebar-layout [slot=sidebar] {
+    width: 280px;
+  }
+</style>
+```
+
+The `breakpoint` property specifies the media query that determines when the sidebar is collapsed. The default value collapses the sidebar when the browser screen width is less than 960px. To manually control the collapse of the sidebar, set the `breakpoint` to empty, and then toggle the `collapsed` property value.
 
 ```html
-<nebula-sidebar-layout breakpoint collapsed>
+<nebula-sidebar-layout breakpoint collapsed="{{collapsed}}">
   <div slot="sidebar"></div>
   <div slot="content"></div>
 </nebula-sidebar-layout>
@@ -52,20 +67,17 @@ Use the `breakpoint` property to set the media query that determines when the si
 
 ## Style
 
-You can style the element using CSS custom properties and mixins:
+You can style the element using CSS variables and mixins:
 
 Custom property | Description | Default
 :--- | :--- | :---
 `--nebula-sidebar-layout-backdrop-color` | The color of the backdrop. | hsla(0, 0%, 0%, 0.6)
-`--nebula-sidebar-layout-background-color` | The background color for the element. | transparent
-`--nebula-sidebar-layout-width` | The fixed width of the sidebar container. | 280px
 `--nebula-sidebar-layout-transition-duration` | The speed of transitions. | 0.25s
 `--nebula-sidebar-layout-z-index` | The stacking elevation of the sidebar overlay. | 9998
 
 The following styles can also be set as attributes on the element:
 
 - 'backdrop-color'
-- `width`
 
 @demo demo/index.html
 -->
@@ -75,8 +87,6 @@ The following styles can also be set as attributes on the element:
     <style>
       :host {
         --nebula-sidebar-layout-backdrop-color: hsla(0, 0%, 0%, 0.6);
-        --nebula-sidebar-layout-background-color: transparent;
-        --nebula-sidebar-layout-width: 280px;
         --nebula-sidebar-layout-transition-duration: 0.25s;
         --nebula-sidebar-layout-z-index: 9998;
         position: relative;
@@ -85,7 +95,6 @@ The following styles can also be set as attributes on the element:
         margin: 0;
         padding: 0;
         border: 0;
-        background-color: var(--nebula-sidebar-layout-background-color);
         height: 100%;
         width: 100%;
         @apply --layout-horizontal;
@@ -133,7 +142,7 @@ The following styles can also be set as attributes on the element:
         outline: 0;
         overflow: hidden;
         overflow-y: auto;
-        width: var(--nebula-sidebar-layout-width);
+        width: fit-content;
         transform: translate3d(0, 0, 0);
         transition: transform var(--nebula-sidebar-layout-transition-duration) ease;
         @apply --layout-flex-none;
@@ -155,6 +164,7 @@ The following styles can also be set as attributes on the element:
         transition: transform var(--nebula-sidebar-layout-transition-duration) ease;
       }
     </style>
+    <iron-media-query query="[[breakpoint]]" query-matches="{{match}}"></iron-media-query>
     <div id="sidebar" tabindex="-1">
       <slot name="sidebar"></slot>
     </div>
@@ -165,7 +175,7 @@ The following styles can also be set as attributes on the element:
   <script>
     Polymer({
       /**
-      * Event triggered when the element collapsed or opened state is changed.
+      * Event triggered when the `collapsed` or `opened` properties are changed.
       * Check the event detail for `collapsed` and `opened` values.
       * @event changed
       */
@@ -176,9 +186,16 @@ The following styles can also be set as attributes on the element:
       hostAttributes: {
         'role': 'dialog'
       },
+      /**
+      * A map of attributes that will update CSS variables.
+      */
+      _styleAttributes: {
+        'backdrop-color': '--nebula-sidebar-layout-backdrop-color',
+        'width': '--nebula-sidebar-layout-width'
+      },
       properties: {
         /**
-        * True if the sidebar is open, otherwise false.
+        * Indicates if the element is opened.
         * The property is ignored if the element is not collapsed.
         */
         opened: {
@@ -188,7 +205,7 @@ The following styles can also be set as attributes on the element:
           value: false
         },
         /**
-        * True if the sidebar is collapsed, otherwise false.
+        * Indicates if the element is collapsed.
         */
         collapsed: {
           type: Boolean,
@@ -197,55 +214,97 @@ The following styles can also be set as attributes on the element:
           value: false
         },
         /**
-        * Media query used to match breakpoint for collapsing the sidebar.
+        * Media query expression used as the breakpoint for collapsing the element.
         * Set to null to collapse the element manually.
-        * Defaults to `(max-width: 960px)`.
         */
         breakpoint: {
           type: String,
           value: '(max-width: 960px)'
         },
         /**
-        * A static map of attributes  CSS variables for theming.
+        * Indicates if gesture support to swipe the element open and closed is enabled.
         */
-        styleAttributes: {
-          'backdrop-color': '--nebula-sidebar-layout-backdrop-color',
-          'width': '--nebula-sidebar-layout-width'
+        enableSwipe: {
+          type: Boolean,
+          value: false
         }
       },
       listeners: {
-        'tap': '_onTap'
+        'tap': '_onTap',
+        'track': '_onTrack'
       },
       observers: [
         '_onOpenedChanged(opened)',
         '_onCollapsedChanged(collapsed)',
-        '_onBreakpointChanged(breakpoint)'
+        '_onMatchChanged(match)'
       ],
+      attached: function() {
+        this.listen(document.body, 'track', '_onTrack')
+      },
+      detached: function() {
+        this.unlisten(document.body, 'track', '_onTrack')
+      },     
       /**
-      * Event handler triggered when a the element is tapped.
+      * Event handler triggered when the element is tapped.
       */
       _onTap: function(e) {
         if (this.opened) {
           e.preventDefault()
-          this.set('opened', false)
+          this.close()
         }
       },
+      /**
+      * Event handler triggered when a touch or mouse gesture occurs.
+      */
+      _onTrack: function(e) {
+        if (this.opened === void(0)) return
+        if (!this.enableSwipe) return
+
+        if (e.detail.state === 'start') {
+          if (this.opened === true) {
+            // detect if user swiped left from anywhere
+            if (e.detail.dx < 0) {
+              this.close()
+            }
+          } else {
+            // detect if user swiped right from the left edge of the screen
+            if (e.detail.x < 64 && e.detail.dx > 0) {
+              this.open()
+            }
+          }
+        }
+      },
+      /**
+      * Property observer triggered when the media query `queryMatches` is changed.
+      * The property is only applicable if a breakpoint is set.
+      * If the breakpoint is set, it updates the `collapsed` property.
+      */
+      _onMatchChanged: function(match) {
+        if (match === void(0)) return
+        if (!(typeof this.breakpoint === 'string' && this.breakpoint.length > 0)) return
+        this.set('collapsed', match)
+      },
+      /**
+      * Property observer triggered when the `collapsed` property is changed.
+      */
       _onCollapsedChanged: function(collapsed) {
-        this.fire('changed', {collapsed: this.collapsed, opened: this.opened}, {bubbles: false})
+        if (collapsed === void(0)) return
+        this.fire('changed', null, {bubbles: false})
       },
       /**
        * 
       * Property observer triggered when the `opened` property is changed.
       */
       _onOpenedChanged: function(opened) {
+        if (opened === void(0)) return
         if (opened) {
           this.$.sidebar.focus()
-          window.addEventListener('resize', this._onResize.bind(this))
-          this.fire('changed', {collapsed: this.collapsed, opened: this.opened}, {bubbles: false})
+          this.listen(window, 'resize', '_onResize')
+          this.fire('changed', null, {bubbles: false})
         } else {
           this.$.content.focus()
-          window.removeEventListener('resize', this._onResize)
-          this.fire('changed', {collapsed: this.collapsed, opened: this.opened}, {bubbles: false})
+          this.unlisten(window, 'resize', '_onResize')
+          this.fire('changed', null, {bubbles: false})
         }
       },
       /**
@@ -253,26 +312,7 @@ The following styles can also be set as attributes on the element:
       * If the element is currently open, it will close the element.
       */
       _onResize: function(e) {
-        if (this.opened) {
-          this.set('opened', false)
-        }
-      },
-      /**
-      * Property observer triggered when the `breakpoint` property is changed.
-      */
-      _onBreakpointChanged: function(breakpoint) {
-        if (this._mq) mq.removeListener(this._onBreakpoint)
-        if (breakpoint && breakpoint.length > 0) {
-          this._mq = window.matchMedia(breakpoint)
-          this._mq.addListener(this._onBreakpoint.bind(this))
-          this.set('collapsed', this._mq.matches)
-        }        
-      },
-      /**
-      * Event listener triggered when the breakpoint media query is matched.
-      */
-      _onBreakpoint: function(e) {
-        this.set('collapsed', this._mq.matches)
+        this.close()
       },
       /**
       * Opens the element if currently collapsed.

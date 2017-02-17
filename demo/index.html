@@ -7,64 +7,71 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../inert-polyfill/inert-polyfill.min.js"></script>
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
     <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
     <link rel="import" href="../../iron-icons/iron-icons.html">
     <link rel="import" href="../../paper-toolbar/paper-toolbar.html">
     <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
     <link rel="import" href="../nebula-sidebar-layout.html">
-    <style is="custom-style">
-      html, body {
-        position: relative;
-        border: 0;
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        overflow-y: auto;
-        box-sizing: border-box;
-      }
-      #sidebar div[slot=sidebar] {
-        @apply --layout-flex-auto;
-        
-        background-color: black;
-        color: white;
-      }
-      #sidebar div[slot=sidebar] paper-toolbar {
-        --paper-toolbar-background: grey;
-      }
-      #sidebar div[slot=content] {
-        @apply --layout-flex-auto;
-      }
-    </style>
+    <custom-style>
+      <style is="custom-style" include="demo-pages-shared-styles">
+        html, body {
+          position: relative;
+          border: 0;
+          margin: 0;
+          padding: 0;
+          min-height: 100vh;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          overflow-y: auto;
+          box-sizing: border-box;
+        }
+        #sidebar div[slot=sidebar] {
+          width: 280px;
+          @apply --layout-flex-auto;
+          
+          background-color: black;
+          color: white;
+        }
+        #sidebar div[slot=sidebar] paper-toolbar {
+          --paper-toolbar-background: grey;
+        }
+        #sidebar div[slot=content] {
+          @apply --layout-flex-auto;
+        }
+      </style>
+    </custom-style>
   </head>
   <body>
-    <template is="dom-bind" id="demo">
-      <nebula-sidebar-layout id="sidebar" collapsed="{{collapsed}}" opened="{{opened}}">
-        <div slot="sidebar">
-          <paper-toolbar>
-            <div class="middle title">Sidebar</div>
-          </paper-toolbar>
-        </div>
-        <div slot="content">
-          <paper-toolbar>
-            <paper-icon-button icon="menu" on-tap="show" hidden$="[[!collapsed]]"></paper-icon-button>
-            <div class="title">Content</div>
-            <paper-icon-button icon="more-vert" on-tap="moreAction"></paper-icon-button>
-          </paper-toolbar>
-          <div style="padding: 10px">
-            Change the width of the browser to automatically show and hide the sidebar.
+    <dom-bind>
+      <template is="dom-bind" id="demo">
+        <nebula-sidebar-layout id="sidebar" breakpoint collapsed opened="{{opened}}">
+          <div slot="sidebar">
+            <paper-toolbar>
+              <div class="middle title">Sidebar</div>
+            </paper-toolbar>
           </div>
-        </div>
-      </nebula-sidebar-layout>
-      <script>
-        demo.show = function(e) {
-          e.stopPropagation()
-          var el =document.getElementById('sidebar')
-          el.opened = true
-        }
-      </script>
-    </template>
+          <div slot="content">
+            <paper-toolbar>
+              <paper-icon-button icon="menu" on-tap="show" hidden$="[[!collapsed]]"></paper-icon-button>
+              <div class="title">Content</div>
+              <paper-icon-button icon="more-vert" on-tap="moreAction"></paper-icon-button>
+            </paper-toolbar>
+            <div style="padding: 10px">
+              Change the width of the browser to automatically show and hide the sidebar.
+            </div>
+          </div>
+        </nebula-sidebar-layout>
+      </template>
+    </dom-bind>
+    <script>
+      demo.show = function(e) {
+        e.stopPropagation()
+        var el =document.getElementById('sidebar')
+        el.opened = true
+      }
+    </script>
   </body>
 </html>

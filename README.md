@@ -1,6 +1,6 @@
 [![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/arsnebula/nebula-sidebar-layout)
 
-[![Build Status](https://saucelabs.com/browser-matrix/arsnebula.svg)](https://saucelabs.com/beta/builds/cab9a1d9da5f4bd2b0e942333430fc98)
+[![Build Status](https://saucelabs.com/browser-matrix/arsnebula.svg)](https://saucelabs.com/beta/builds/fe2d4267e251497ca9eb731fb6ae0578)
 
 # \<nebula-sidebar-layout\>
 
@@ -12,9 +12,7 @@ A web component to display a collapsable sidebar layout.
 * Automatically makes the content container `inert` when the drawer is open
 * Easily customized using CSS custom variables, mixins or style properties
 
-> Warning: This element utilizes features of [ECMAScript 2015](http://www.ecma-international.org/ecma-262/6.0/) which may not be supported by all browsers. To ensure support by all browsers, consider using the [Core-js Polyfill](https://github.com/zloirock/core-js).
-
-> Warning: This element utilizes [Inert Subtrees](https://html.spec.whatwg.org/multipage/interaction.html#inert-subtrees), a draft feature of HTML which may not be supported by all browsers. To ensure support by all browsers, consider using the [Inert Polyfill](https://github.com/GoogleChrome/inert-polyfill).
+> Warning: This element supports [Inert Subtrees](https://html.spec.whatwg.org/multipage/interaction.html#inert-subtrees), a draft feature of HTML which may not be supported by all browsers. To ensure support by all browsers, consider using the [Inert Polyfill](https://github.com/GoogleChrome/inert-polyfill).
 
 ## Installation
 
@@ -30,7 +28,7 @@ Import the element:
 <link rel="import" href="/bower_components/nebula-sidebar-layout/nebula-sidebar-layout.html"> 
 ```
 
-Add and configure the element markup. The element utilizes offscreen positioning for the drawer when collapsed, so the the `body` and and other parent elements should be set to fill the browser screen.
+Add and configure the element markup. The element utilizes offscreen positioning for the drawer when collapsed, so the `body` and and other parent elements should be set to fill the browser screen.
 
 The following is a sample stylesheet for ensuring the body matches the viewport.
 
@@ -53,17 +51,14 @@ The following is a sample stylesheet for ensuring the body matches the viewport.
 </head>
 ```
 
-Add the element markup. By default, the `sidebar` and `content` slots are vertical flexbox containers that will fill the viewport. Style attributes like `width` and `backdrop-color` can be used in markup, or style the element with CSS variables.
+Add the element markup. By default, the `sidebar` and `content` slots are vertical flexbox containers that will fill the viewport.
 
 ```html
 <nebula-sidebar-layout
-  id="sidebar"
-  width="280px"
   breakpoint="(max-width: 960px)"
-  backdrop-color="hsla(0, 0%, 0%, 0.6)"
   collapsed="{{collapsed}}"
   opened="{{opened}}"
-  on-change="_onSidebarChanged">
+  on-changed="_onSidebarChanged">
 
   <div slot="sidebar"></div>
   <div slot="content"></div>

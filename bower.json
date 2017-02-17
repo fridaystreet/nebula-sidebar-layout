@@ -24,7 +24,8 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^1.7.1",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.3.1",
-    "nebula-style-attributes-behavior": "arsnebula/nebula-style-attributes-behavior#^1.1.0"
+    "nebula-style-attributes-behavior": "arsnebula/nebula-style-attributes-behavior#^1.1.0",
+    "iron-media-query": "PolymerElements/iron-media-query#^1.0.8"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

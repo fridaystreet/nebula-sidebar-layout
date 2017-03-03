@@ -1,6 +1,7 @@
 [![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/arsnebula/nebula-sidebar-layout)
+[![Gitter chat](https://badges.gitter.im/org.png)](https://gitter.im/arsnebula/webcomponents)
 
-[![Build Status](https://saucelabs.com/browser-matrix/arsnebula.svg)](https://saucelabs.com/beta/builds/fe2d4267e251497ca9eb731fb6ae0578)
+[![Build Status](https://saucelabs.com/browser-matrix/arsnebula.svg)](https://saucelabs.com/beta/builds/948f95059df94701b06a7fd8ed7bf78b)
 
 # \<nebula-sidebar-layout\>
 
@@ -16,7 +17,7 @@ A web component to display a collapsable sidebar layout.
 
 ## Installation
 
-```
+```sh
 $ bower install -S arsnebula/nebula-sidebar-layout
 ```
 
@@ -24,13 +25,11 @@ $ bower install -S arsnebula/nebula-sidebar-layout
 
 Import the element:
 
-```
+```html
 <link rel="import" href="/bower_components/nebula-sidebar-layout/nebula-sidebar-layout.html"> 
 ```
 
-Add and configure the element markup. The element utilizes offscreen positioning for the drawer when collapsed, so the `body` and and other parent elements should be set to fill the browser screen.
-
-The following is a sample stylesheet for ensuring the body matches the viewport.
+The element utilizes offscreen positioning for the drawer when collapsed, so the `body` and and other parent elements should be set to fill the browser screen. The following is a sample stylesheet for ensuring the body matches the viewport.
 
 ```css
 <head>
@@ -51,18 +50,30 @@ The following is a sample stylesheet for ensuring the body matches the viewport.
 </head>
 ```
 
-Add the element markup. By default, the `sidebar` and `content` slots are vertical flexbox containers that will fill the viewport.
+Add the element.
 
 ```html
 <nebula-sidebar-layout
   breakpoint="(max-width: 960px)"
   collapsed="{{collapsed}}"
   opened="{{opened}}"
-  on-changed="_onSidebarChanged">
+  on-changed="_onChanged">
 
   <div slot="sidebar"></div>
   <div slot="content"></div>
 </nebula-sidebar-layout>
+```
+
+Style the element.
+
+```css
+nebula-sidebar-layout {
+  --nebula-sidebar-layout-backdrop-color: hsla(0, 0%, 0%, 0.6);
+  --nebula-sidebar-layout-transition-duration: 0.25s;
+  --nebula-sidebar-layout-sidebar: {
+    border-right: 1px solid silver;
+  }
+}
 ```
 
 *For more information on element properties and methods see the element API documentation.*

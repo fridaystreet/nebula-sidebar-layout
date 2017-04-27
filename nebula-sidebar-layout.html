@@ -167,7 +167,7 @@ Custom property | Description
         transition: opacity var(--nebula-sidebar-layout-transition-duration, 0.25s) linear;
         @apply --nebula-sidebar-layout-opened-backdrop;
       }
-      #sidebar {
+      :host #sidebar {
         display: -ms-flexbox;
         display: -webkit-flex;
         display: flex;
@@ -189,6 +189,26 @@ Custom property | Description
         transition: transform var(--nebula-sidebar-layout-transition-duration, 0.25s) ease;
         @apply --nebula-sidebar-layout-sidebar;
       }
+
+      :host([right]) #sidebar {
+        right: 0;
+        @apply --nebula-sidebar-layout-sidebar;
+        @apply --nebula-sidebar-layout-right-sidebar;
+      }
+
+      :host([right][collapsed]) #sidebar {
+        position: fixed;
+        right: 0;
+        left: inherit;
+        top: 0;
+        bottom: 0;
+        visibility: hidden;
+        transform: translate3d(100%, 0, 0);
+        transition: transform var(--nebula-sidebar-layout-transition-duration, 0.25s) ease, visibility 0s linear var(--nebula-sidebar-layout-transition-duration, 0.25s);
+        @apply --nebula-sidebar-layout-collapsed-sidebar;
+        @apply --nebula-sidebar-layout-right-collapsed-sidebar;
+      }
+
       :host([collapsed]) #sidebar {
         position: fixed;
         left: 0;
@@ -199,6 +219,16 @@ Custom property | Description
         transition: transform var(--nebula-sidebar-layout-transition-duration, 0.25s) ease, visibility 0s linear var(--nebula-sidebar-layout-transition-duration, 0.25s);
         @apply --nebula-sidebar-layout-collapsed-sidebar;
       }
+
+      :host([right][collapsed][opened]) #sidebar {
+        z-index: 9998;
+        visibility: visible;
+        transform: translate3d(0, 0, 0);
+        transition: transform var(--nebula-sidebar-layout-transition-duration, 0.25s) ease;
+        @apply --nebula-sidebar-layout-opened-sidebar;
+        @apply --nebula-sidebar-layout-right-opened-sidebar;
+      }
+
       :host([collapsed][opened]) #sidebar {
         z-index: 9998;
         visibility: visible;
@@ -208,12 +238,23 @@ Custom property | Description
       }
     </style>
     <iron-media-query query="[[breakpoint]]" query-matches="{{match}}"></iron-media-query>
-    <div id="sidebar" tabindex="-1">
-      <slot name="sidebar"></slot>
-    </div>
-    <div id="content" inert$="{{opened}}" tabindex="-1">
-      <slot name="content"></slot>
-    </div>
+    <template is="dom-if" if="{{!right}}">
+      <div id="sidebar" tabindex="-1">
+        <slot name="sidebar"></slot>
+      </div>
+      <div id="content" inert$="{{opened}}" tabindex="-1">
+        <slot name="content"></slot>
+      </div>
+    </template>
+
+    <template is="dom-if" if="{{right}}">
+      <div id="content" inert$="{{opened}}" tabindex="-1">
+        <slot name="content"></slot>
+      </div>
+      <div id="sidebar" tabindex="-1">
+        <slot name="sidebar"></slot>
+      </div>
+    </template>
   </template>
   <script>
     Polymer({
@@ -226,6 +267,10 @@ Custom property | Description
         'role': 'dialog'
       },
       properties: {
+        right: {
+          type: Boolean,
+          value: false
+        },
         /**
         * Indicates if the element is opened.
         * The property is ignored if the element is not collapsed.
@@ -324,7 +369,7 @@ Custom property | Description
         this.fire('changed', null, {bubbles: false})
       },
       /**
-       * 
+       *
       * Property observer triggered when the `opened` property is changed.
       */
       _onOpenedChanged: function(opened) {
@@ -349,15 +394,15 @@ Custom property | Description
       open: function() {
         if (this.collapsed) {
           this.set('opened', true)
-        }        
+        }
       },
       /**
       * Closes the element if currently open.
-      */ 
+      */
       close: function() {
         if (this.opened) {
           this.set('opened', false)
-        }        
+        }
       }
     })
   </script>
